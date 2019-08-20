@@ -1,0 +1,163 @@
+<html>
+   <title>Web Socket Test</title>
+  <body>
+    <h2>Web Socket Test</h2>
+   
+    <button type="button" onclick="document.getElementById('demo').innerHTML =  testWebSocket();">Click me to connect</button>   
+     <button type="button" onclick="document.getElementById('demo').innerHTML = websocket.close();">Click me to close connection</button> 
+    <table id="table" border="1">
+        <tr>
+            <th>Selling Price</th>
+            <th>Buying Price</th>
+        </tr> 
+         
+        <tr>
+             <td></td>
+             <td></td>
+        </tr>
+        <tr>
+             <td></td>
+             <td></td>
+        </tr>
+        <tr>
+             <td></td>
+             <td></td>
+        </tr>
+        <tr>
+             <td></td>
+            <td></td>
+        </tr>
+        <tr>
+             <td></td>
+             <td></td>
+        </tr>
+    </table>
+
+
+
+
+
+ 
+ 
+  <script language="javascript" type="text/javascript">
+
+  var wsUri = "ws://localhost:8084/ServerFinalExperiment12_07_19/server";
+  var output;
+  var x,y;
+  var count=0;
+  var arrayX = [];
+  var arrayY = [];
+  var children = [];
+  var finalarray1_sp = [];
+  var finalarray2_bp = [];
+
+  
+  function init()
+  {
+    
+    output = document.getElementById("output");
+      
+  }
+
+  function testWebSocket()
+  {
+    websocket = new WebSocket(wsUri);
+     
+    websocket.onopen = function(evt) { onOpen(evt) };
+    websocket.onclose = function(evt) { onClose(evt) };
+    websocket.onmessage = function(evt) {  onMessage(evt) };
+    websocket.onerror = function(evt) { onError(evt) }; 
+  }
+
+  function onMessage(evt)
+  {
+        var obj=JSON.parse(evt.data);
+        x=obj.BuyingPrice;
+        y=obj.SellingPrice;
+
+       if(count<5)
+       {   
+           arrayX.push(x);
+           arrayY.push(y);
+           children = arrayX.concat(arrayY);
+              
+       }
+        if(count>=5)
+        {
+            arrayX.shift();
+            arrayX.push(x);
+
+            arrayY.shift();
+            arrayY.push(y);
+            
+            children = arrayX.concat(arrayY);
+            
+             //vvvvvv important logic
+            //remove its first child node (index 0).
+               /* if(output.hasChildNodes()) 
+                {
+                    output.removeChild(output.childNodes[0]);
+                   
+                }*/
+                
+               // finalarray1 = children.slice(0,children.length/2);
+                //finalarray2 = children.slice(children.length/2,children.length);
+        }
+                
+               
+        finalarray1_sp = children.slice(0,children.length/2);
+        finalarray2_bp = children.slice(children.length/2,children.length);
+        
+        
+       
+        table=document.getElementById("table");
+        
+        
+        table.rows[1].cells[0].innerHTML = finalarray1_sp[0];
+        table.rows[2].cells[0].innerHTML = finalarray1_sp[1];
+        table.rows[3].cells[0].innerHTML = finalarray1_sp[2];
+        table.rows[4].cells[0].innerHTML = finalarray1_sp[3];
+        table.rows[5].cells[0].innerHTML = finalarray1_sp[4];
+        
+        
+        table.rows[1].cells[1].innerHTML = finalarray2_bp[0];
+        table.rows[2].cells[1].innerHTML = finalarray2_bp[1];
+        table.rows[3].cells[1].innerHTML = finalarray2_bp[2];
+        table.rows[4].cells[1].innerHTML = finalarray2_bp[3];
+        table.rows[5].cells[1].innerHTML = finalarray2_bp[4];
+        
+        count++;
+   
+    }
+
+     
+  
+    
+    
+  function onError(evt){}
+  function doSend(message){}
+  function onOpen(evt){}
+  function onClose(evt)
+  {
+    writeToScreen("DISCONNECTED");
+      document.getElementById(elementID).innerHTML = "";
+      websocket.close();
+  }
+  function writeToScreen(message)
+  {
+     
+    var pre = document.createElement("p");
+    pre.innerHTML = message;
+    //if(output.hasChildNodes()){}
+    //else
+        output.appendChild(pre);
+     
+  }
+ 
+  window.addEventListener("load", init, false);
+
+  </script>
+  <div id="output"></div>
+  </body>
+
+</html>
